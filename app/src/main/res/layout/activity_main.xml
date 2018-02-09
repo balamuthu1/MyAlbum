@@ -7,5 +7,13 @@
     android:background="@drawable/ic_background"
     tools:context="leboncoin.test.com.myphotos.views.MainActivity">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/activity_margin_content"
+        android:paddingTop="@dimen/activity_margin_content"/>
+
 
 </RelativeLayout>

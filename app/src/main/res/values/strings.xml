@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MyPhotos</string>
+    <string name="error_msg">Oops! Problème lors de la récupération des albums</string>
+    <string name="btn_retry">Rééssayer</string>
+    <string name="error_msg_no_internet">Pas de connection internet</string>
+    <string name="error_msg_timeout">Le server met trop de temps à répondre</string>
+    <string name="error_msg_unknown">Une erreur est survenue</string>
+    <string name="tap_to_reload">Relancer</string>
 </resources>
