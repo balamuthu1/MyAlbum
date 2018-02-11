@@ -37,11 +37,7 @@ public class FooterViewHolder extends RecyclerView.ViewHolder implements View.On
         switch (view.getId()) {
             case R.id.error_btn_retry:
             case R.id.error_layout:
-
-                //Send Event
-                //
                 mCallback.retryPageLoad();
-
                 break;
         }
     }

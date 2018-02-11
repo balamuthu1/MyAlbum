@@ -59,14 +59,17 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case HEADER:
+                //header content
                 View viewHeader = inflater.inflate(R.layout.main_content_layout, parent, false);
                 viewHolder = new ContentViewHolder(viewHeader);
                 break;
             case CONTENT:
+                //Main content
                 View viewItem = inflater.inflate(R.layout.main_content_layout, parent, false);
                 viewHolder = new ContentViewHolder(viewItem);
                 break;
             case FOOTER:
+                //footer content
                 View viewFooter = inflater.inflate(R.layout.footer_content_layout, parent, false);
                 viewHolder = new FooterViewHolder(viewFooter, mCallback);
                 break;
@@ -80,6 +83,7 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         switch (getItemViewType(position)) {
             case HEADER:
+                //Bind the header view data
                 LocalAlbum album = albumList.get(position);
                 final ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
                 contentViewHolder.txtId.setText("" + album.getPhotoId());
@@ -97,12 +101,12 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                 break;
             case CONTENT:
+                //Bind main content view with data
                 LocalAlbum album2 = albumList.get(position);
                 final ContentViewHolder contentViewHolder2 = (ContentViewHolder) holder;
-
                 contentViewHolder2.txtId.setText("" + album2.getPhotoId());
-
                 contentViewHolder2.txtDescription.setText(album2.getTitle());
+
                 //use glide to load images
                 Glide.with(context)
                         .load(album2.getThumbnailUrl())
@@ -115,12 +119,11 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
 
             case FOOTER:
+                //Bind footer view
                 FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
 
                 if (retryPageLoad) {
                     footerViewHolder.errorLayout.setVisibility(View.VISIBLE);
-                    //footerViewHolder.progressBar.setVisibility(View.GONE);
-
                     footerViewHolder.errorText.setText(
                             errorMsg != null ?
                                     errorMsg :
@@ -128,7 +131,6 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                 } else {
                     footerViewHolder.errorLayout.setVisibility(View.GONE);
-                    //footerViewHolder.progressBar.setVisibility(View.VISIBLE);
                 }
                 break;
         }

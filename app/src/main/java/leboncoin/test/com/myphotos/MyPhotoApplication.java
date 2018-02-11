@@ -6,6 +6,5 @@ import com.orm.SugarApp;
  * Created by Muthu on 09/02/2018.
  */
 
-public class MyPhotoApplication extends SugarApp {
-
-}
+//TO add sugarorm
+public class MyPhotoApplication extends SugarApp {}

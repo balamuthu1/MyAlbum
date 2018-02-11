@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import leboncoin.test.com.myphotos.R;
 import leboncoin.test.com.myphotos.adapters.MyPhotoAdapter;
 import leboncoin.test.com.myphotos.api.IMyPhotoRetrofitService;
@@ -33,11 +34,6 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
     MyPhotoAdapter adapter;
     LinearLayoutManager linearLayoutManager;
     Parcelable layoutManagerSavedState;
-    RecyclerView rv;
-    ProgressBar progressBar;
-    LinearLayout errorLayout;
-    Button btnRetry;
-    TextView txtError;
 
     private String SAVED_LAYOUT_MANAGER = "SAVED_LAYOUT_MANAGER";
     private static final int PAGE_START = 1;
@@ -51,24 +47,26 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
     private IMyPhotoRetrofitService iMyPhotoRetrofitService;
     private List<LocalAlbum> localAlbumList;
 
+    @BindView(R.id.main_recycler)
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rv = (RecyclerView) findViewById(R.id.main_recycler);
         adapter = new MyPhotoAdapter(this);
         linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        rv.setLayoutManager(linearLayoutManager);
-        rv.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        rv.setAdapter(adapter);
-        rv.addOnScrollListener(new MyPhotoScrollListener(linearLayoutManager) {
+        recyclerView.setAdapter(adapter);
+        //custom scroll listner to load data bloc by bloc
+        recyclerView.addOnScrollListener(new MyPhotoScrollListener(linearLayoutManager) {
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
                 currentPage += 1;
-
+                //if scrolled the load next page
                 loadNextPage();
             }
 
@@ -91,34 +89,33 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
         iMyPhotoRetrofitService = MyPhotoRetrofitClient.getClient().create(IMyPhotoRetrofitService.class);
 
         try {
+            //load data from cache
             localAlbumList = LocalAlbum.listAll(LocalAlbum.class);
             adapter.addAll(localAlbumList);
+            //restore the scroll position if we com from other activity
             restoreLayoutManagerPosition();
+
+            //get current page index after restoring from cache
             if(null != localAlbumList && localAlbumList.size()>0){
                currentPage = localAlbumList.get(localAlbumList.size()-1).getAlbumId();
                 if (currentPage != TOTAL_PAGES) adapter.addLoadingFooter();
             }
 
         } catch (SQLiteException e) {
+            //here we catch exception when database is not created or table is not created
             e.printStackTrace();
 
         }
 
         if(null == localAlbumList || localAlbumList.size() ==0){
+            //if no cach --> opening for first time, so load first page
             loadFirstPage();
         }
     }
     private void loadFirstPage() {
-        // To ensure list is visible when retry button in error view is clicked
-        //hideErrorView();
         iMyPhotoRetrofitService.getAlbums(currentPage).enqueue(new Callback<List<Album>>() {
             @Override
             public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
-                // To ensure list is visible when retry button in error view is clicked
-                //hideErrorView();
-
-
-
                 adapter.addAll(convertToLocalAlbumsList(response.body()));
                 if (currentPage != TOTAL_PAGES) adapter.addLoadingFooter();
                 else isLastPage = true;
@@ -126,12 +123,13 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
 
             @Override
             public void onFailure(Call<List<Album>> call, Throwable t) {
-                //showErrorView(t);
+                //show first error layout
             }
         });
 
     }
 
+    //Method to convert Server object to local database object to cache
     private List<LocalAlbum> convertToLocalAlbumsList(List<Album> albumList){
         List<LocalAlbum> list = new ArrayList<>();
         for (Album album : albumList) {
@@ -168,28 +166,18 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
     @Override
     public void retryPageLoad() {
         loadNextPage();
-
-    }
-    private void showErrorView(Throwable throwable) {
-
-        if (errorLayout.getVisibility() == View.GONE) {
-            errorLayout.setVisibility(View.VISIBLE);
-            //progressBar.setVisibility(View.GONE);
-
-            txtError.setText(getString(R.string.error_msg));
-        }
-    }
-    private void hideErrorView() {
-        if (errorLayout.getVisibility() == View.VISIBLE) {
-            errorLayout.setVisibility(View.GONE);
-            //progressBar.setVisibility(View.VISIBLE);
-        }
     }
 
+
+    /********************************************************************
+     *
+     * @param outState
+     * This block is to store and restore the state of recyclerview
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(SAVED_LAYOUT_MANAGER, rv.getLayoutManager().onSaveInstanceState());
+        outState.putParcelable(SAVED_LAYOUT_MANAGER, recyclerView.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
@@ -201,19 +189,21 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
     }
     private void restoreLayoutManagerPosition() {
         if (layoutManagerSavedState != null) {
-            rv.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
+            recyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
         }
     }
 
+    /********************************************************************/
+
+
+    //While back is pressed if you are not at the top of the list, then scroll to top, else quit the app
     @Override
     public void onBackPressed() {
        if(linearLayoutManager.findFirstVisibleItemPosition() == 0){
            super.onBackPressed();
        }else{
-           rv.smoothScrollToPosition(0);
+           recyclerView.smoothScrollToPosition(0);
        }
-
-
 
     }
 }
