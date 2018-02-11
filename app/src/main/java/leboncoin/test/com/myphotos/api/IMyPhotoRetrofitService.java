@@ -1,5 +1,7 @@
 package leboncoin.test.com.myphotos.api;
 
+import java.util.List;
+
 import leboncoin.test.com.myphotos.models.Album;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -12,6 +14,6 @@ import retrofit2.http.Query;
 public interface IMyPhotoRetrofitService {
 
     @GET("photos")
-    Call<Album> getAlbums(@Query("albumId") int pageIndex);
+    Call<List<Album>> getAlbums(@Query("albumId") int pageIndex);
 
 }
