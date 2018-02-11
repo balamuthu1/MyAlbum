@@ -2,6 +2,8 @@ package leboncoin.test.com.myphotos.adapters;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import leboncoin.test.com.myphotos.R;
 import leboncoin.test.com.myphotos.callbacks.MyPhotoAdapterCallback;
 import leboncoin.test.com.myphotos.models.Album;
 import leboncoin.test.com.myphotos.models.LocalAlbum;
+import leboncoin.test.com.myphotos.views.DetailFragment;
 import leboncoin.test.com.myphotos.views.holder.ContentViewHolder;
 import leboncoin.test.com.myphotos.views.holder.FooterViewHolder;
 import leboncoin.test.com.myphotos.views.holder.HeaderViewHolder;
@@ -84,7 +87,7 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         switch (getItemViewType(position)) {
             case HEADER:
                 //Bind the header view data
-                LocalAlbum album = albumList.get(position);
+                final LocalAlbum album = albumList.get(position);
                 final ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
                 contentViewHolder.txtId.setText("" + album.getPhotoId());
 
@@ -98,11 +101,16 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(contentViewHolder.imgIcone);
 
-
+                contentViewHolder.item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showEditDialog(album.getUrl(), album.getTitle());
+                    }
+                });
                 break;
             case CONTENT:
                 //Bind main content view with data
-                LocalAlbum album2 = albumList.get(position);
+                final LocalAlbum album2 = albumList.get(position);
                 final ContentViewHolder contentViewHolder2 = (ContentViewHolder) holder;
                 contentViewHolder2.txtId.setText("" + album2.getPhotoId());
                 contentViewHolder2.txtDescription.setText(album2.getTitle());
@@ -115,6 +123,12 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(contentViewHolder2.imgIcone);
 
+                contentViewHolder2.item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showEditDialog(album2.getUrl(), album2.getTitle());
+                    }
+                });
 
                 break;
 
@@ -268,6 +282,12 @@ public class MyPhotoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyItemChanged(albumList.size() - 1);
 
         if (errorMsg != null) this.errorMsg = errorMsg;
+    }
+
+    private void showEditDialog(String url, String desc) {
+        FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
+        DetailFragment detailFragment = DetailFragment.newInstance(url, desc);
+        detailFragment.show(fm, "detailFragment");
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import leboncoin.test.com.myphotos.R;
 import leboncoin.test.com.myphotos.adapters.MyPhotoAdapter;
 import leboncoin.test.com.myphotos.api.IMyPhotoRetrofitService;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements MyPhotoAdapterCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         adapter = new MyPhotoAdapter(this);
         linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
