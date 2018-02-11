@@ -33,24 +33,18 @@ public class ApiUnitTest {
         MockWebServer mockWebServer = new MockWebServer();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(mockWebServer.url("").toString())
-                //TODO Add your Retrofit parameters here
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         LocalAlbum album = new LocalAlbum(1,1, "test", "url", "thumb");
         List<LocalAlbum> list = new ArrayList<>();
         list.add(album);
-        //Set a response for retrofit to handle. You can copy a sample
-        //response from your server to simulate a correct result or an error.
-        //MockResponse can also be customized with different parameters
-        //to match your test needs
+        //Set a response for retrofit to handle.
         String json = new Gson().toJson(list);
         mockWebServer.enqueue(new MockResponse().setBody(json));
 
         IMyPhotoRetrofitService service = retrofit.create(IMyPhotoRetrofitService.class);
 
-        //With your service created you can now call its method that should
-        //consume the MockResponse above. You can then use the desired
-        //assertion to check if the result is as expected. For example:
+        //consume the MockResponse above.
         Call<List<Album>> call = service.getAlbums(1);
         assertEquals(1,((List<Album>)call.execute().body()).size());
 
@@ -61,22 +55,17 @@ public class ApiUnitTest {
     //test with real server
     @Test
     public void testRealserver() throws IOException {
-        MockWebServer mockWebServer = new MockWebServer();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiUtils.BASE_URL)
-                //TODO Add your Retrofit parameters here
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         IMyPhotoRetrofitService service = retrofit.create(IMyPhotoRetrofitService.class);
 
-        //With your service created you can now call its method that should
-        //consume the MockResponse above. You can then use the desired
-        //assertion to check if the result is as expected. For example:
+
+        //consume the MockResponse above.
         Call<List<Album>> call = service.getAlbums(1);
         assertEquals(50,((List<Album>)call.execute().body()).size());
 
-        //Finish web server
-        mockWebServer.shutdown();
     }
 }
